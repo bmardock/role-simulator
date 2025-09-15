@@ -1,0 +1,245 @@
+{
+  "scenarios": {
+    "first_standup": {
+      "title": "First Standup",
+      "text": "It's your first day as the new engineering manager. The team is gathered in the conference room, coffee in hand, looking at you expectantly. Some seem curious, others skeptical. How will you structure this crucial first meeting to set the tone for your leadership?",
+      "options": {
+        "round_robin": {
+          "hint": "Round robin updates",
+          "description": "Go around the table and have everyone share what they worked on yesterday, what they're working on today, and any blockers. This ensures everyone gets a voice and you can see the full picture.",
+          "immediate": {
+            "leader.culture": 3,
+            "company.velocity": -1
+          }
+        },
+        "blockers_first": {
+          "hint": "Focus on blockers",
+          "description": "Start by asking 'What's blocking us from shipping?' and dive deep into each issue. This keeps the meeting focused on removing obstacles rather than status updates.",
+          "immediate": {
+            "company.velocity": 2,
+            "company.morale": -1
+          }
+        },
+        "async": {
+          "hint": "Async updates",
+          "description": "Cancel the meeting and ask everyone to post their updates in Slack. Use the time for 1:1s instead. This respects everyone's time and allows for deeper individual conversations.",
+          "immediate": {
+            "company.morale": 2,
+            "leader.culture": -1
+          }
+        }
+      }
+    },
+    "crunch_time": {
+      "title": "Crunch Time",
+      "text": "The quarterly demo is in 3 days, and the flagship feature is nowhere near ready. The CEO has been asking for updates, and the pressure is mounting. Your team looks exhausted, but the deadline is non-negotiable. The board meeting depends on this demo going well.",
+      "options": {
+        "crunch": {
+          "hint": "Weekend push",
+          "description": "Ask the team to work through the weekend. Order pizza, bring in coffee, and lead by example by staying late yourself. Sometimes you need to push hard to hit critical deadlines.",
+          "immediate": {
+            "company.velocity": 5,
+            "company.morale": -3,
+            "hidden.burnout": 2
+          }
+        },
+        "cut": {
+          "hint": "Cut scope",
+          "description": "Sit down with the team and identify what can be cut or simplified to make the deadline. Be transparent about the tradeoffs and get buy-in on what features can wait for the next release.",
+          "immediate": {
+            "leader.trust": 2,
+            "company.stakeholder": -2
+          }
+        },
+        "neg": {
+          "hint": "Negotiate delay",
+          "description": "Go to the CEO and explain the situation honestly. Propose a realistic timeline and explain the risks of rushing. Sometimes the best leadership is knowing when to push back.",
+          "immediate": {
+            "company.morale": 3,
+            "company.financials": -2
+          }
+        }
+      }
+    },
+    "promotion_request": {
+      "title": "Promotion Request",
+      "text": "Sarah, your most senior engineer, has been with the company for 3 years and just delivered a major project ahead of schedule. She's asking for a promotion to Staff Engineer and a 25% raise. However, the company is in a budget crunch, and you know other team members are also expecting promotions. Sarah is clearly frustrated and has mentioned getting calls from recruiters.",
+      "options": {
+        "approve": {
+          "hint": "Approve promotion",
+          "description": "Recognize Sarah's excellent work and approve the promotion and raise. You'll figure out the budget implications later, but retaining top talent is crucial. This sends a strong message about recognizing performance.",
+          "immediate": {
+            "company.morale": 2,
+            "leader.trust": -2
+          }
+        },
+        "deny": {
+          "hint": "Deny with explanation",
+          "description": "Explain the budget constraints and current company situation. Offer a smaller raise and a clear path to promotion in the next quarter. Sometimes you have to make tough decisions for the company's financial health.",
+          "immediate": {
+            "company.financials": 2,
+            "company.morale": -2
+          }
+        },
+        "plan": {
+          "hint": "Create growth plan",
+          "description": "Acknowledge Sarah's value and create a detailed 6-month growth plan with specific milestones. Offer a smaller immediate raise but tie the full promotion to achieving these goals. This shows investment in her development.",
+          "immediate": {
+            "leader.trust": 2,
+            "company.velocity": -1
+          }
+        }
+      }
+    },
+    "design_conflict": {
+      "title": "Design Conflict",
+      "text": "Two of your senior engineers, Alex and Jordan, have been arguing for days about the architecture for the new microservices platform. Alex wants to use Kubernetes with a service mesh, while Jordan insists on a simpler container orchestration approach. The tension is affecting the whole team, and the project is stalled. Both engineers are respected and have valid technical arguments.",
+      "options": {
+        "pick_quick": {
+          "hint": "Pick one side",
+          "description": "Make a decision based on your technical judgment and tell the team to move forward. Sometimes you need to break the deadlock and make the call, even if it's not perfect. The team needs to keep moving.",
+          "immediate": {
+            "company.velocity": 3,
+            "leader.trust": -2
+          }
+        },
+        "facilitate": {
+          "hint": "Facilitate discussion",
+          "description": "Bring Alex and Jordan together for a structured technical debate. Set ground rules, have them present their cases with pros/cons, and guide them toward a compromise solution that incorporates the best of both approaches.",
+          "immediate": {
+            "leader.trust": 3,
+            "company.velocity": -2
+          }
+        },
+        "escalate": {
+          "hint": "Escalate to architect",
+          "description": "Bring in the company's principal architect to make the technical decision. This removes the burden from you and ensures the decision comes from the highest technical authority. Sometimes you need to defer to expertise.",
+          "immediate": {
+            "company.stakeholder": 2,
+            "company.morale": -2
+          }
+        }
+      }
+    },
+    "budget_cut": {
+      "title": "Budget Cut",
+      "text": "The CFO just called you into their office. Due to market conditions, your engineering budget needs to be cut by 20% starting next month. This means you'll need to let go of contractors, freeze hiring, or find other ways to reduce costs. The team is already stretched thin, and you have several critical projects in flight.",
+      "options": {
+        "contractors": {
+          "hint": "Cut contractors",
+          "description": "Let go of the external contractors first. They're the easiest to cut and don't affect your core team's morale as much. You'll need to redistribute their work among the full-time engineers, but it keeps the team intact.",
+          "immediate": {
+            "company.financials": 4,
+            "company.velocity": -3
+          }
+        },
+        "freeze": {
+          "hint": "Freeze hiring",
+          "description": "Put all open positions on hold and cancel planned hires. This preserves current team capacity but means you'll be understaffed for growth. You'll need to be creative about how to handle increased workload.",
+          "immediate": {
+            "company.financials": 3,
+            "company.morale": -2
+          }
+        },
+        "negotiate": {
+          "hint": "Negotiate scope",
+          "description": "Go back to stakeholders and renegotiate project scope and timelines. Explain that with reduced budget, some features will need to be delayed or simplified. This requires strong communication but preserves team capacity.",
+          "immediate": {
+            "leader.trust": 2,
+            "company.stakeholder": -3
+          }
+        }
+      }
+    },
+    "production_outage": {
+      "title": "Production Outage",
+      "text": "It's 2 AM and your phone is blowing up. The payment system is down, customers can't complete purchases, and the error rate is climbing. The on-call engineer is struggling to identify the root cause, and the CEO is demanding updates every 15 minutes. Revenue is being lost with every passing minute.",
+      "options": {
+        "lead_fix": {
+          "hint": "Lead the fix",
+          "description": "Jump on the incident call and take charge of the debugging process. Roll up your sleeves and work alongside the team to identify and fix the issue. Sometimes the team needs their leader in the trenches with them.",
+          "immediate": {
+            "leader.trust": 3,
+            "hidden.burnout": 2
+          }
+        },
+        "manage_comms": {
+          "hint": "Manage communications",
+          "description": "Focus on stakeholder communication and coordination. Let the technical team handle the debugging while you manage updates to leadership, customers, and coordinate with other departments. Play to your strengths as a leader.",
+          "immediate": {
+            "company.stakeholder": 3,
+            "company.velocity": -2
+          }
+        },
+        "escalate": {
+          "hint": "Escalate to CTO",
+          "description": "Bring in the CTO and other senior technical leaders to help resolve the issue. This brings more expertise to bear and shows you're not afraid to ask for help when the situation is beyond your team's capabilities.",
+          "immediate": {
+            "company.financials": 2,
+            "leader.trust": -2
+          }
+        }
+      }
+    },
+    "customer_escalation": {
+      "title": "Customer Escalation",
+      "text": "Your biggest customer, TechCorp, is threatening to churn. Their CTO just called you directly, furious about a critical bug that's been affecting their production systems for 3 days. They're demanding immediate fixes and compensation, and they've mentioned they're evaluating competitors. This customer represents 30% of your revenue.",
+      "options": {
+        "discount": {
+          "hint": "Offer discount",
+          "description": "Immediately offer a significant discount on their next renewal and commit to priority support. This shows good faith and helps retain the relationship while you work on the technical fix. Sometimes you need to invest in customer retention.",
+          "immediate": {
+            "company.stakeholder": 3,
+            "company.financials": -4
+          }
+        },
+        "hotfix": {
+          "hint": "Rush hotfix",
+          "description": "Drop everything and have your team work around the clock to deliver a hotfix. This might introduce technical debt, but it shows commitment to the customer and gets them unblocked quickly. Sometimes speed matters more than perfect code.",
+          "immediate": {
+            "company.stakeholder": 2,
+            "company.tech_debt": 3
+          }
+        },
+        "exec_call": {
+          "hint": "Executive call",
+          "description": "Set up a call with their CTO and your CEO to discuss the situation at the highest level. This shows the customer that you're taking their concerns seriously and brings executive weight to the resolution process.",
+          "immediate": {
+            "company.stakeholder": 4,
+            "company.morale": -2
+          }
+        }
+      }
+    },
+    "refactor_investment": {
+      "title": "Refactor Investment",
+      "text": "Your engineers are asking for 2 weeks to refactor the legacy authentication system. They argue it's becoming a bottleneck and causing bugs, but you have a tight deadline for the new user dashboard feature. The current system works but is indeed showing its age. The team is passionate about this, and they've done their homework with a detailed technical proposal.",
+      "options": {
+        "limited": {
+          "hint": "1 week only",
+          "description": "Compromise by giving them 1 week for the most critical parts of the refactor. This shows you value code quality but also need to balance it with business priorities. Sometimes you can get 80% of the benefit with 50% of the time.",
+          "immediate": {
+            "company.tech_debt": -2,
+            "company.morale": 2
+          }
+        },
+        "full": {
+          "hint": "Full 2 weeks",
+          "description": "Give them the full 2 weeks they're asking for. This shows you trust your team's judgment and are willing to invest in long-term code health. Sometimes the best business decision is to slow down to speed up later.",
+          "immediate": {
+            "company.tech_debt": -4,
+            "company.velocity": -3
+          }
+        },
+        "defer": {
+          "hint": "Defer to next quarter",
+          "description": "Acknowledge the importance of the refactor but explain that current business priorities take precedence. Commit to scheduling it for next quarter when you have more bandwidth. Sometimes you have to make tough prioritization calls.",
+          "immediate": {
+            "company.morale": -2,
+            "company.velocity": 2
+          }
+        }
+      }
+    }
+  }
+}

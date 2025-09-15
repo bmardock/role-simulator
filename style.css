@@ -1,0 +1,266 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #0b0c10;
+  color: #e6e9ef;
+}
+header {
+  padding: 12px 20px;
+  background: #12131a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+header h1 {
+  margin: 0;
+  font-size: 18px;
+}
+header button {
+  background: #1c1f2b;
+  color: #fff;
+  border: 1px solid #2d3345;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+header button:hover {
+  background: #2d3345;
+}
+header button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+main {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+.card {
+  background: #12131a;
+  border-radius: 10px;
+  padding: 14px;
+}
+.section-title {
+  font-size: 13px;
+  color: #9aa3b2;
+  margin: 0 0 10px;
+}
+.option {
+  margin: 8px 0;
+  padding: 16px;
+  border: 1px solid #2d3345;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #1a1d29;
+}
+.option:hover {
+  background: #2d3345;
+  border-color: #4a5568;
+  transform: translateY(-1px);
+}
+.option-title {
+  font-weight: bold;
+  color: #e6e9ef;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+.option-description {
+  color: #9aa3b2;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.outcome-summary {
+  background: #1a1d29;
+  border: 2px solid #4a90e2;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 16px 0;
+}
+.outcome-summary h3 {
+  color: #4a90e2;
+  margin: 0 0 12px 0;
+  font-size: 18px;
+}
+.outcome-summary p {
+  color: #e6e9ef;
+  line-height: 1.6;
+  margin: 0;
+}
+.continue-prompt {
+  text-align: center;
+  color: #9aa3b2;
+  font-style: italic;
+  padding: 20px;
+  background: #1a1d29;
+  border-radius: 8px;
+  border: 1px dashed #2d3345;
+}
+.dice-display {
+  background: #1a1d29;
+  border: 2px solid #4a90e2;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.dice-display h3 {
+  color: #4a90e2;
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+.dice-values {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.dice-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #12131a;
+  border-radius: 6px;
+  color: #e6e9ef;
+}
+.dice-value {
+  font-weight: bold;
+  color: #4a90e2;
+  font-size: 18px;
+}
+.dice-impact {
+  text-align: center;
+  color: #9aa3b2;
+  font-style: italic;
+}
+.scenario-content {
+  margin-top: 20px;
+}
+.scenario-content h2 {
+  color: #e6e9ef;
+  margin: 0 0 12px 0;
+}
+.scenario-content p {
+  color: #9aa3b2;
+  line-height: 1.6;
+  margin: 0;
+}
+.wait-for-dice {
+  text-align: center;
+  padding: 40px 20px;
+  background: #1a1d29;
+  border-radius: 8px;
+  border: 2px solid #2d3345;
+}
+.wait-for-dice h3 {
+  color: #4a90e2;
+  margin: 0 0 16px 0;
+}
+.wait-for-dice p {
+  color: #9aa3b2;
+  margin: 8px 0;
+}
+.roll-dice-btn {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+  margin: 16px 0;
+}
+.roll-dice-btn:hover {
+  background: #357abd;
+}
+.game-start {
+  text-align: center;
+  padding: 40px 20px;
+  background: #1a1d29;
+  border-radius: 8px;
+  border: 2px solid #4a90e2;
+}
+.game-start h2 {
+  color: #4a90e2;
+  margin: 0 0 20px 0;
+}
+.game-start p {
+  color: #9aa3b2;
+  margin: 12px 0;
+  line-height: 1.6;
+}
+.dice-roll {
+  margin: 10px 0;
+  padding: 8px;
+  background: #1a1d29;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #9aa3b2;
+}
+.message {
+  margin: 10px 0;
+  padding: 12px;
+  background: #2d3345;
+  border-radius: 6px;
+  border-left: 4px solid #4a90e2;
+}
+.archetype-grid,
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.archetype-card,
+.template-card {
+  padding: 16px;
+  border: 2px solid #2d3345;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #1a1d29;
+}
+.archetype-card:hover,
+.template-card:hover {
+  border-color: #4a5568;
+  background: #2d3345;
+}
+.archetype-card.selected,
+.template-card.selected {
+  border-color: #4a90e2;
+  background: #2d3345;
+}
+.archetype-card h3,
+.template-card h3 {
+  margin: 0 0 8px;
+  color: #e6e9ef;
+}
+.archetype-card p,
+.template-card p {
+  margin: 0;
+  font-size: 14px;
+  color: #9aa3b2;
+}
+#startGame {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 16px;
+  background: #4a90e2;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+#startGame:hover {
+  background: #357abd;
+}
+#startGame:disabled {
+  background: #666;
+  cursor: not-allowed;
+}

@@ -1,0 +1,234 @@
+# --- ultralight leadership-sim engine (no backend) ---
+import json, os, random, math, time
+FILES = {"deck":"deck.json","miles":"milestones.json","state":"state.json","mem":"memory.json"}
+
+def save(p,o): open(p,"w").write(json.dumps(o,indent=2))
+def load(p,d): return json.load(open(p)) if os.path.exists(p) else d
+
+# --------- content generators (fresh each run & periodic refresh) ----------
+BASE_SCNS = [
+  ("crunch_time","Crunch Time","Deadline is slipping; pressure mounts.",
+   {"g": {"low":["cut","neg"], "mid":["crunch","cut","neg"], "high":["crunch","cut","neg"]}},
+   {
+     "crunch":{"label":"Weekend push","hint":"↑velocity/execution/stakeholder, ↓morale; burnout risk",
+               "immediate":{"company.velocity":8,"leader.execution":6,"company.morale":-6,"company.stakeholder":3,"hidden.burnout":10},
+               "delayed":[{"after":2,"apply":{"hidden.attrition":"+ceil(hidden.burnout/6)","company.velocity":-2}}]},
+     "cut":{"label":"Cut scope","hint":"↑trust/culture, ↓stakeholder/$$; ↓debt later",
+            "immediate":{"company.velocity":4,"leader.trust":3,"leader.culture":2,"company.stakeholder":-6,"company.financials":-3},
+            "delayed":[{"after":1,"apply":{"company.tech_debt":-4}}]},
+     "neg":{"label":"Negotiate delay","hint":"↑trust/morale, ↓execution/$$; better if external high",
+            "requires":{"external":"mid|high"},
+            "immediate":{"leader.trust":5,"company.morale":5,"leader.execution":-3,"company.financials":-4}}
+   }),
+  ("promotion_request","Promotion Request","Senior IC wants a lead role; performance is uneven.",
+   {"g":{"low":["deny","plan"],"mid":["approve","deny","plan"],"high":["approve","deny","plan"]}},
+   {
+     "approve":{"label":"Promote now","hint":"↑morale, ↓trust; ↑debt later",
+                "immediate":{"company.morale":4,"leader.trust":-2},
+                "delayed":[{"after":2,"apply":{"company.tech_debt":4}}]},
+     "deny":{"label":"Say no (brief)","hint":"↑$$, ↓trust/morale",
+             "immediate":{"company.financials":2,"leader.trust":-3,"company.morale":-2}},
+     "plan":{"label":"Growth plan","hint":"↑trust/culture, small ↓velocity now",
+             "immediate":{"leader.trust":3,"leader.culture":3,"company.velocity":-2},
+             "delayed":[{"after":2,"apply":{"company.velocity":2}}]}
+   }),
+  ("prod_outage","Production Outage","Critical bug takes the product down for hours.",
+   {"g":{"low":["comms","cto"],"mid":["lead_fix","comms","cto"],"high":["lead_fix","comms","cto"]}},
+   {
+     "lead_fix":{"label":"Lead the fix","hint":"↑execution/trust, ↓vision; scaling risk",
+                 "immediate":{"leader.execution":5,"leader.trust":2,"leader.vision":-2,"company.stakeholder":2}},
+     "comms":{"label":"Team fixes; you comms","hint":"↑trust/culture/stakeholder; slower now",
+              "immediate":{"leader.trust":3,"leader.culture":3,"company.stakeholder":3,"company.velocity":-2}},
+     "cto":{"label":"Escalate to CTO","hint":"↑stakeholder now, ↓trust/execution",
+            "immediate":{"company.stakeholder":4,"leader.trust":-3,"leader.execution":-2}}
+   }),
+  ("budget_cut","Budget Cut","Finance demands a 20% reduction this quarter.",
+   {"g":{"low":["freeze","negotiate"],"mid":["contractors","freeze","negotiate"],"high":["contractors","freeze","negotiate"]}},
+   {
+     "contractors":{"label":"Cut contractors","hint":"↑$$, ↓velocity, mild ↓morale",
+                    "immediate":{"company.financials":5,"company.velocity":-3,"company.morale":-1}},
+     "freeze":{"label":"Freeze hire/travel","hint":"↑$$, small ↓velocity; +trust if explained",
+               "immediate":{"company.financials":3,"company.velocity":-1,"leader.trust":1}},
+     "negotiate":{"label":"Phase with CFO","hint":"↑trust; luck may boost stakeholder/$$",
+                  "immediate":{"leader.trust":2,"company.stakeholder":-2}}
+   })
+]
+
+def generate_deck(salt):
+    rnd=random.Random(salt)
+    scns={}
+    for sid,title,text,gate,opts in BASE_SCNS:
+        # slight numeric mutation for freshness
+        mut=lambda v:int(round(v*rnd.uniform(0.9,1.1))) if isinstance(v,int) else v
+        mopts={}
+        for oid,o in opts.items():
+            o2=json.loads(json.dumps(o))
+            for k,val in list(o2.get("immediate",{}).items()):
+                o2["immediate"][k]=mut(val)
+            for d in o2.get("delayed",[]):
+                for k,val in list(d["apply"].items()):
+                    if isinstance(val,int): d["apply"][k]=mut(val)
+            mopts[oid]=o2
+        scns[sid]={"title":title,"text":text,"gates":gate["g"],"options":mopts}
+    return {"scenarios":scns}
+
+def mutate_deck(deck, state, salt):
+    # replace ~30% scenarios via new salt; tweak some deltas ±15%
+    rnd=random.Random(salt+state["turn"])
+    fresh=generate_deck(rnd.getrandbits(32))["scenarios"]
+    scns=deck["scenarios"]
+    ids=list(scns.keys())
+    for sid in rnd.sample(ids, max(1,len(ids)//3)):
+        scns[sid]=fresh[sid]
+    # target one wildcard based on weakest stat
+    weak=min(state["company"], key=state["company"].get)
+    if "budget_cut" in scns and weak=="financials":
+        scns["budget_cut"]["options"]["negotiate"]["immediate"]["company.stakeholder"] += rnd.choice([0,1])
+    return {"scenarios":scns}
+
+def generate_milestones(salt):
+    rnd=random.Random(salt)
+    up= rnd.randint(3,5); down=rnd.randint(3,5)
+    return {
+      "quarterly":{"everyTurns":3,"hi":65+rnd.randint(-2,2),"lo":45+rnd.randint(-2,2),
+                   "hiApply":{"company.financials":up,"company.stakeholder":up-1},
+                   "loApply":{"company.financials":-down,"leader.trust":-(down-1)}},
+      "annual":{"turn":12,"endings":[
+        {"if":"company.financials<=0","ending":"out_of_business"},
+        {"if":"leader.trust<30 && company.stakeholder<40","ending":"fired"},
+        {"if":"company.financials>=70 && company.stakeholder>=70 && company.velocity>=70","ending":"ipo"},
+        {"if":"leader.trust>=65 && leader.culture>=60","ending":"high_trust_leader"},
+        {"default":"balanced_operator"}]}
+    }
+
+def init_state(template="startup", archetype="operator", seed=None):
+    templates={"startup":{"morale":55,"velocity":58,"tech_debt":48,"stakeholder":42,"financials":40},
+               "scaleup":{"morale":54,"velocity":62,"tech_debt":56,"stakeholder":52,"financials":55},
+               "bigco":{"morale":52,"velocity":48,"tech_debt":46,"stakeholder":62,"financials":65}}
+    leaders={"operator":{"trust":52,"execution":62,"vision":50,"culture":44},
+             "servant":{"trust":54,"execution":50,"vision":50,"culture":60},
+             "visionary":{"trust":50,"execution":50,"vision":62,"culture":48},
+             "firefighter":{"trust":50,"execution":60,"vision":48,"culture":42}}
+    leader=leaders[archetype].copy(); company=templates[template].copy()
+    hidden={"burnout":max(0,(60-company["morale"])//2),
+            "attrition":max(0,(100-leader["trust"])//3),
+            "crisis":max(0,(company["tech_debt"]-50)//2 + (5 if company["financials"]<40 else 0))}
+    return {"leader":leader,"company":company,"hidden":hidden,"turn":1,"delayed":[],"seed":seed or int(time.time())}
+
+# ------------- game loop helpers -------------
+def dice(state):
+    r=random.Random(state["seed"]+state["turn"])
+    return {"internal":r.randint(1,6),"external":r.randint(1,6),"opportunity":r.randint(1,6),"luck":r.randint(1,6)}
+
+def gate_options(scenario, dice_roll):
+    band = "low" if dice_roll["internal"]==1 else ("mid" if dice_roll["internal"] in [2,3] else "high")
+    allowed = scenario["gates"].get(band, list(scenario["options"].keys()))
+    # external requires
+    out=[]
+    for oid in allowed:
+        req = scenario["options"][oid].get("requires",{})
+        if "external" in req:
+            if "high" in req["external"] and dice_roll["external"]<4: continue
+        out.append(oid)
+    return out
+
+def pick_scenario(deck, state, dice_roll, mem):
+    scns=deck["scenarios"]; ids=list(scns.keys())
+    # bias: avoid last scenario, slight nudge based on stats
+    avoid=set(mem.get("recent_scenarios",[])[-2:])
+    cand=[i for i in ids if i not in avoid] or ids
+    r=random.Random(state["seed"]^state["turn"])
+    return r.choice(cand)
+
+def apply_delta(state, path, val):
+    grp,key=path.split("."); state[grp][key]=int(max(0,min(100,state[grp][key]+val)))
+
+def apply_choice(state, scenario, option, dice_roll):
+    for k,v in option.get("immediate",{}).items(): apply_delta(state,k,v)
+    for d in option.get("delayed",[]):
+        state["delayed"].append({"due":state["turn"]+d["after"],"apply":d["apply"]})
+
+def process_delayed(state):
+    keep=[]
+    for it in state["delayed"]:
+        if state["turn"]>=it["due"]:
+            for k,v in it["apply"].items():
+                if isinstance(v,str) and v.startswith("+ceil(hidden.burnout/"):
+                    denom=int(v.split("/")[1].split(")")[0])
+                    inc=math.ceil(state["hidden"]["burnout"]/denom)
+                    apply_delta(state,k,inc)
+                else: apply_delta(state,k,v)
+        else: keep.append(it)
+    state["delayed"]=keep
+
+def quarterly(state, miles, events):
+    if state["turn"]%miles["quarterly"]["everyTurns"]!=0: return
+    c,l=state["company"], state["leader"]
+    score = 0.3*c["velocity"] + 0.2*c["stakeholder"] + 0.2*l["trust"] + 0.3*c["morale"] - 0.1*c["tech_debt"]
+    if score>=miles["quarterly"]["hi"]:
+        for k,v in miles["quarterly"]["hiApply"].items(): apply_delta(state,k,v)
+        events.append("Quarterly: Board pleased. Budget up.")
+    elif score<miles["quarterly"]["lo"]:
+        for k,v in miles["quarterly"]["loApply"].items(): apply_delta(state,k,v)
+        events.append("Quarterly: Underperformance. Budget cut.")
+
+def annual(state, miles):
+    if state["turn"]!=miles["annual"]["turn"]: return None
+    l,c=state["leader"], state["company"]
+    if c["financials"]<=0: return "out_of_business"
+    if l["trust"]<30 and c["stakeholder"]<40: return "fired"
+    if c["financials"]>=70 and c["stakeholder"]>=70 and c["velocity"]>=70: return "ipo"
+    if l["trust"]>=65 and l["culture"]>=60: return "high_trust_leader"
+    return "balanced_operator"
+
+def novelty(mem): 
+    rs=mem.get("recent_scenarios",[]); ro=mem.get("recent_options",[])
+    return max(0,1 - 0.1*max(0,len(rs)-len(set(rs))) - 0.1*max(0,len(ro)-len(set(ro))))
+
+# ---- bootstrap or continue ----
+def start_run(template="startup", archetype="operator"):
+    deck = generate_deck(int(time.time()))
+    miles = generate_milestones(int(time.time()))
+    state = init_state(template, archetype)
+    mem = {"recent_scenarios":[],"recent_options":[],"turns_since_refresh":0}
+    save(FILES["deck"],deck); save(FILES["miles"],miles); save(FILES["state"],state); save(FILES["mem"],mem)
+    return turn()
+
+def turn():
+    deck=load(FILES["deck"],{"scenarios":{}}); miles=load(FILES["miles"],{}); state=load(FILES["state"],{}); mem=load(FILES["mem"],{})
+    # refresh deck occasionally
+    if mem.get("turns_since_refresh",0)>=3 or novelty(mem)<0.6:
+        deck = mutate_deck(deck, state, int(time.time())); save(FILES["deck"],deck); mem["turns_since_refresh"]=0
+    dr=dice(state)
+    sid=pick_scenario(deck,state,dr,mem); sc=deck["scenarios"][sid]
+    allowed=gate_options(sc,dr)
+    state["last"]={"sid":sid,"dr":dr}
+    save(FILES["state"],state); save(FILES["mem"],mem)
+    # present
+    opts=[{"id":oid,"label":sc["options"][oid]["label"],"hint":sc["options"][oid]["hint"]} for oid in allowed]
+    print(f"🎲 Internal {dr['internal']} | External {dr['external']} | Opportunity {dr['opportunity']} | Luck {dr['luck']}")
+    print(f"{sc['title']} — {sc['text']}")
+    for o in opts: print(f"{o['id']} — {o['hint']}")
+    print("Reply with option id.")
+    return {"scenario":sc["title"],"options":[o["id"] for o in opts]}
+
+def choose(option_id):
+    deck=load(FILES["deck"],{}); miles=load(FILES["miles"],{}); state=load(FILES["state"],{}); mem=load(FILES["mem"],{})
+    sid=state["last"]["sid"]; sc=deck["scenarios"][sid]; dr=state["last"]["dr"]
+    if option_id not in sc["options"]: raise ValueError("Invalid option id.")
+    apply_choice(state, sc, sc["options"][option_id], dr)
+    process_delayed(state)
+    state["turn"] += 1
+    events=[]; quarterly(state,miles,events); ending = annual(state,miles)
+    # update memory
+    mem.setdefault("recent_scenarios",[]).append(sid); mem.setdefault("recent_options",[]).append(option_id); mem["turns_since_refresh"]=mem.get("turns_since_refresh",0)+1
+    save(FILES["state"],state); save(FILES["mem"],mem)
+    # summarize
+    print("✓ choice applied.")
+    for e in events: print("•",e)
+    if ending: print("🏁 Ending:", ending)
+    if not ending: turn()
+    return {"ending":ending}
+
+# ---- kick off a run (you can change template/archetype) ----
+start_run("startup","operator")
