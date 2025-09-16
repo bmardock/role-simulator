@@ -1,12 +1,15 @@
 {
   "scenarios": {
     "first_standup": {
+      "phase": "early",
+      "tags": ["onboarding", "team_norms"],
       "title": "First Standup",
       "text": "It's your first day as the new engineering manager. The team is gathered in the conference room, coffee in hand, looking at you expectantly. Some seem curious, others skeptical. How will you structure this crucial first meeting to set the tone for your leadership?",
       "options": {
         "round_robin": {
           "hint": "Round robin updates",
           "description": "Go around the table and have everyone share what they worked on yesterday, what they're working on today, and any blockers. This ensures everyone gets a voice and you can see the full picture.",
+          "tags": ["collaborative", "people_focused", "culture_building"],
           "immediate": {
             "leader.culture": 3,
             "company.velocity": -1
@@ -15,6 +18,7 @@
         "blockers_first": {
           "hint": "Focus on blockers",
           "description": "Start by asking 'What's blocking us from shipping?' and dive deep into each issue. This keeps the meeting focused on removing obstacles rather than status updates.",
+          "tags": ["execution_focused", "quick_decision", "process_heavy"],
           "immediate": {
             "company.velocity": 2,
             "company.morale": -1
@@ -23,6 +27,7 @@
         "async": {
           "hint": "Async updates",
           "description": "Cancel the meeting and ask everyone to post their updates in Slack. Use the time for 1:1s instead. This respects everyone's time and allows for deeper individual conversations.",
+          "tags": ["innovative", "people_focused", "empathy_driven"],
           "immediate": {
             "company.morale": 2,
             "leader.culture": -1
@@ -31,37 +36,47 @@
       }
     },
     "crunch_time": {
+      "phase": "mid",
+      "tags": ["velocity_low", "stakeholder_pressure", "burnout_high"],
       "title": "Crunch Time",
       "text": "The quarterly demo is in 3 days, and the flagship feature is nowhere near ready. The CEO has been asking for updates, and the pressure is mounting. Your team looks exhausted, but the deadline is non-negotiable. The board meeting depends on this demo going well.",
       "options": {
         "crunch": {
           "hint": "Weekend push",
           "description": "Ask the team to work through the weekend. Order pizza, bring in coffee, and lead by example by staying late yourself. Sometimes you need to push hard to hit critical deadlines.",
+          "tags": ["crisis_response", "execution_focused", "high_pressure"],
           "immediate": {
             "company.velocity": 5,
             "company.morale": -3,
-            "hidden.burnout": 2
+            "hidden.burnout": 2,
+            "economy.mau": 2
           }
         },
         "cut": {
           "hint": "Cut scope",
           "description": "Sit down with the team and identify what can be cut or simplified to make the deadline. Be transparent about the tradeoffs and get buy-in on what features can wait for the next release.",
+          "tags": ["collaborative", "strategic", "people_focused"],
           "immediate": {
             "leader.trust": 2,
-            "company.stakeholder": -2
+            "company.stakeholder": -2,
+            "economy.burnRate": -0.1
           }
         },
         "neg": {
           "hint": "Negotiate delay",
           "description": "Go to the CEO and explain the situation honestly. Propose a realistic timeline and explain the risks of rushing. Sometimes the best leadership is knowing when to push back.",
+          "tags": ["strategic", "long_term", "vision_driven"],
           "immediate": {
             "company.morale": 3,
-            "company.financials": -2
+            "company.financials": -2,
+            "economy.revenueIndex": -0.3
           }
         }
       }
     },
     "promotion_request": {
+      "phase": "mid",
+      "tags": ["financials_low", "morale_low", "trust_low"],
       "title": "Promotion Request",
       "text": "Sarah, your most senior engineer, has been with the company for 3 years and just delivered a major project ahead of schedule. She's asking for a promotion to Staff Engineer and a 25% raise. However, the company is in a budget crunch, and you know other team members are also expecting promotions. Sarah is clearly frustrated and has mentioned getting calls from recruiters.",
       "options": {
@@ -92,12 +107,15 @@
       }
     },
     "design_conflict": {
+      "phase": "mid",
+      "tags": ["morale_low", "velocity_low", "trust_low"],
       "title": "Design Conflict",
       "text": "Two of your senior engineers, Alex and Jordan, have been arguing for days about the architecture for the new microservices platform. Alex wants to use Kubernetes with a service mesh, while Jordan insists on a simpler container orchestration approach. The tension is affecting the whole team, and the project is stalled. Both engineers are respected and have valid technical arguments.",
       "options": {
         "pick_quick": {
           "hint": "Pick one side",
           "description": "Make a decision based on your technical judgment and tell the team to move forward. Sometimes you need to break the deadlock and make the call, even if it's not perfect. The team needs to keep moving.",
+          "tags": ["quick_decision", "execution_focused", "decisive"],
           "immediate": {
             "company.velocity": 3,
             "leader.trust": -2
@@ -106,6 +124,7 @@
         "facilitate": {
           "hint": "Facilitate discussion",
           "description": "Bring Alex and Jordan together for a structured technical debate. Set ground rules, have them present their cases with pros/cons, and guide them toward a compromise solution that incorporates the best of both approaches.",
+          "tags": ["collaborative", "people_focused", "culture_building"],
           "immediate": {
             "leader.trust": 3,
             "company.velocity": -2
@@ -114,6 +133,7 @@
         "escalate": {
           "hint": "Escalate to architect",
           "description": "Bring in the company's principal architect to make the technical decision. This removes the burden from you and ensures the decision comes from the highest technical authority. Sometimes you need to defer to expertise.",
+          "tags": ["strategic", "process_heavy", "conservative"],
           "immediate": {
             "company.stakeholder": 2,
             "company.morale": -2
@@ -122,6 +142,8 @@
       }
     },
     "budget_cut": {
+      "phase": "late",
+      "tags": ["financials_low", "stakeholder_pressure"],
       "title": "Budget Cut",
       "text": "The CFO just called you into their office. Due to market conditions, your engineering budget needs to be cut by 20% starting next month. This means you'll need to let go of contractors, freeze hiring, or find other ways to reduce costs. The team is already stretched thin, and you have several critical projects in flight.",
       "options": {
@@ -152,6 +174,8 @@
       }
     },
     "production_outage": {
+      "phase": "late",
+      "tags": ["crisis_risk", "burnout_high", "stakeholder_pressure"],
       "title": "Production Outage",
       "text": "It's 2 AM and your phone is blowing up. The payment system is down, customers can't complete purchases, and the error rate is climbing. The on-call engineer is struggling to identify the root cause, and the CEO is demanding updates every 15 minutes. Revenue is being lost with every passing minute.",
       "options": {
@@ -182,6 +206,8 @@
       }
     },
     "customer_escalation": {
+      "phase": "mid",
+      "tags": ["stakeholder_pressure", "financials_low"],
       "title": "Customer Escalation",
       "text": "Your biggest customer, TechCorp, is threatening to churn. Their CTO just called you directly, furious about a critical bug that's been affecting their production systems for 3 days. They're demanding immediate fixes and compensation, and they've mentioned they're evaluating competitors. This customer represents 30% of your revenue.",
       "options": {
@@ -190,7 +216,8 @@
           "description": "Immediately offer a significant discount on their next renewal and commit to priority support. This shows good faith and helps retain the relationship while you work on the technical fix. Sometimes you need to invest in customer retention.",
           "immediate": {
             "company.stakeholder": 3,
-            "company.financials": -4
+            "company.financials": -4,
+            "economy.revenueIndex": -0.5
           }
         },
         "hotfix": {
@@ -198,7 +225,8 @@
           "description": "Drop everything and have your team work around the clock to deliver a hotfix. This might introduce technical debt, but it shows commitment to the customer and gets them unblocked quickly. Sometimes speed matters more than perfect code.",
           "immediate": {
             "company.stakeholder": 2,
-            "company.tech_debt": 3
+            "company.tech_debt": 3,
+            "economy.mau": 3
           }
         },
         "exec_call": {
@@ -206,12 +234,15 @@
           "description": "Set up a call with their CTO and your CEO to discuss the situation at the highest level. This shows the customer that you're taking their concerns seriously and brings executive weight to the resolution process.",
           "immediate": {
             "company.stakeholder": 4,
-            "company.morale": -2
+            "company.morale": -2,
+            "economy.revenueIndex": 0.3
           }
         }
       }
     },
     "refactor_investment": {
+      "phase": "mid",
+      "tags": ["tech_debt_high", "velocity_low", "morale_low"],
       "title": "Refactor Investment",
       "text": "Your engineers are asking for 2 weeks to refactor the legacy authentication system. They argue it's becoming a bottleneck and causing bugs, but you have a tight deadline for the new user dashboard feature. The current system works but is indeed showing its age. The team is passionate about this, and they've done their homework with a detailed technical proposal.",
       "options": {
@@ -238,6 +269,305 @@
             "company.morale": -2,
             "company.velocity": 2
           }
+        }
+      }
+    },
+    "onboarding_1on1s": {
+      "phase": "early",
+      "tags": ["onboarding", "morale_low"],
+      "title": "First Week 1:1s",
+      "text": "It's your first week. You can either book 30‑minute 1:1s with everyone, focus on senior leads only, or shadow customer calls to understand the product fast.",
+      "options": {
+        "everyone": {
+          "hint": "Meet everyone",
+          "description": "Schedule short 1:1s with each engineer to build trust early.",
+          "immediate": { "leader.trust": 3, "company.morale": 2, "company.velocity": -1 }
+        },
+        "leads_only": {
+          "hint": "Meet leads",
+          "description": "Prioritize senior leads to map systems and risks.",
+          "immediate": { "leader.vision": 2, "company.velocity": 1, "company.morale": -1 }
+        },
+        "shadow_calls": {
+          "hint": "Shadow customers",
+          "description": "Join sales/support calls to hear pain points first‑hand.",
+          "immediate": { "leader.vision": 3, "company.stakeholder": 2, "leader.culture": -1 }
+        }
+      }
+    },
+    "team_charter": {
+      "phase": "early",
+      "tags": ["team_norms", "process_heavy"],
+      "title": "Team Charter",
+      "text": "The team lacks clear norms around PRs, testing, and on‑call. Do you codify a lightweight charter now or defer?",
+      "options": {
+        "lightweight": {
+          "hint": "Write lightweight charter",
+          "description": "Define review SLAs, testing bar, and incident roles in one page.",
+          "immediate": { "leader.trust": 2, "company.velocity": 1, "company.tech_debt": -1 }
+        },
+        "heavy": {
+          "hint": "Full process",
+          "description": "Adopt a detailed process playbook with templates and checklists.",
+          "immediate": { "company.velocity": -2, "company.stakeholder": 2, "leader.trust": 1 }
+        },
+        "defer": {
+          "hint": "Defer",
+          "description": "Keep shipping and revisit norms next month.",
+          "immediate": { "company.velocity": 2, "company.tech_debt": 2 }
+        }
+      }
+    },
+    "establish_oncall": {
+      "phase": "early",
+      "tags": ["crisis_risk", "process_heavy"],
+      "title": "Establish On‑Call",
+      "text": "Paging is ad‑hoc. You can formalize rotations now or push it off to focus on features.",
+      "options": {
+        "formalize": {
+          "hint": "Formalize rotation",
+          "description": "Create schedule, runbooks, and escalation paths.",
+          "immediate": { "leader.trust": 2, "hidden.crisis": -1, "company.velocity": -1 }
+        },
+        "stipend": {
+          "hint": "Stipend only",
+          "description": "Offer stipend for coverage without process overhead.",
+          "immediate": { "company.morale": 1, "hidden.crisis": 0, "company.financials": -1 }
+        },
+        "defer": {
+          "hint": "Defer",
+          "description": "Keep current approach and revisit after launch.",
+          "immediate": { "company.velocity": 2, "hidden.crisis": 1 }
+        }
+      }
+    },
+    "hiring_pipeline": {
+      "phase": "mid",
+      "tags": ["velocity_low", "promotion_pressure"],
+      "title": "Hiring Pipeline",
+      "text": "Headcount plan increased but pipeline is thin. Focus on referrals, agency, or lower the bar slightly?",
+      "options": {
+        "referrals": {
+          "hint": "Referral push",
+          "description": "Run a referral sprint with bonuses and outreach templates.",
+          "immediate": { "company.morale": 1, "company.velocity": 1, "economy.burnRate": 0.05 }
+        },
+        "agency": {
+          "hint": "Use agency",
+          "description": "Engage an external recruiter for speed.",
+          "immediate": { "company.velocity": 2, "company.financials": -2, "economy.burnRate": 0.2 }
+        },
+        "lower_bar": {
+          "hint": "Lower bar",
+          "description": "Relax requirements to fill seats quickly.",
+          "immediate": { "company.velocity": 2, "leader.trust": -2, "company.tech_debt": 2 }
+        }
+      }
+    },
+    "cross_team_dependency": {
+      "phase": "mid",
+      "tags": ["stakeholder_pressure", "velocity_low"],
+      "title": "Cross‑Team Dependency",
+      "text": "Another team owns a service you depend on and they're blocked. Do you embed an engineer, escalate, or fork?",
+      "options": {
+        "embed": {
+          "hint": "Embed engineer",
+          "description": "Loan an engineer for a sprint to unblock them.",
+          "immediate": { "leader.trust": 2, "company.velocity": 1, "company.morale": -1 }
+        },
+        "escalate": {
+          "hint": "Escalate",
+          "description": "Push through leadership to reprioritize their work.",
+          "immediate": { "company.stakeholder": 2, "leader.trust": -1 }
+        },
+        "fork": {
+          "hint": "Fork temporarily",
+          "description": "Build a temporary fork or shim to move forward.",
+          "immediate": { "company.velocity": 2, "company.tech_debt": 3 }
+        }
+      }
+    },
+    "security_audit": {
+      "phase": "mid",
+      "tags": ["process_heavy", "stakeholder_pressure"],
+      "title": "Security Audit",
+      "text": "A security firm found medium‑severity issues. Fix all now, patch criticals only, or defer with compensating controls?",
+      "options": {
+        "fix_all": {
+          "hint": "Fix all",
+          "description": "Stop feature work to address all findings.",
+          "immediate": { "company.tech_debt": -4, "company.velocity": -3, "company.stakeholder": 2 }
+        },
+        "crit_only": {
+          "hint": "Criticals only",
+          "description": "Patch criticals now, backlog the rest.",
+          "immediate": { "company.tech_debt": -2, "company.velocity": -1, "leader.trust": 1 }
+        },
+        "defer": {
+          "hint": "Defer",
+          "description": "Document risks and proceed with roadmap.",
+          "immediate": { "company.velocity": 2, "company.stakeholder": -2 }
+        }
+      }
+    },
+    "roadmap_realignment": {
+      "phase": "mid",
+      "tags": ["stakeholder_pressure", "morale_low"],
+      "title": "Roadmap Realignment",
+      "text": "Sales wants feature X; product wants learning bets; eng wants stability. Which way do you tilt?",
+      "options": {
+        "sales": {
+          "hint": "Sales wins",
+          "description": "Commit to closing near‑term revenue.",
+          "immediate": { "company.stakeholder": 3, "economy.revenueIndex": 0.3, "company.morale": -2 }
+        },
+        "product": {
+          "hint": "Product bets",
+          "description": "Invest in learning bets for later payoff.",
+          "immediate": { "leader.vision": 3, "company.velocity": -1 }
+        },
+        "stability": {
+          "hint": "Stability",
+          "description": "Reduce toil and pay tech debt for sustainable speed.",
+          "immediate": { "company.tech_debt": -3, "company.velocity": -1, "company.morale": 1 }
+        }
+      }
+    },
+    "cloud_cost_spike": {
+      "phase": "mid",
+      "tags": ["financials_low"],
+      "title": "Cloud Cost Spike",
+      "text": "A misconfigured job doubled cloud spend this month. Optimize, commit budget, or cut non‑essentials?",
+      "options": {
+        "optimize": {
+          "hint": "Optimize",
+          "description": "Rapid cost review and kill switches.",
+          "immediate": { "leader.trust": 1, "company.financials": 2, "company.velocity": -1 }
+        },
+        "budget": {
+          "hint": "Absorb cost",
+          "description": "Increase budget to maintain velocity.",
+          "immediate": { "company.financials": -3, "company.velocity": 2 }
+        },
+        "cut": {
+          "hint": "Cut features",
+          "description": "Pause non‑critical compute and features.",
+          "immediate": { "company.velocity": -2, "company.financials": 3 }
+        }
+      }
+    },
+    "feature_flag_incident": {
+      "phase": "mid",
+      "tags": ["crisis_risk", "tech_debt_high"],
+      "title": "Feature Flag Incident",
+      "text": "A bad flag rollout hurt MAU. Build guardrails, roll back fast, or hotfix?",
+      "options": {
+        "guardrails": {
+          "hint": "Add guardrails",
+          "description": "Add kill switches and validation.",
+          "immediate": { "company.tech_debt": -2, "company.velocity": -1, "economy.mau": 2 }
+        },
+        "rollback": {
+          "hint": "Rollback",
+          "description": "Rollback all flags and freeze deploys.",
+          "immediate": { "economy.mau": 3, "company.velocity": -2 }
+        },
+        "hotfix": {
+          "hint": "Hotfix",
+          "description": "Patch and continue shipping.",
+          "immediate": { "company.velocity": 2, "economy.mau": 1, "hidden.burnout": 1 }
+        }
+      }
+    },
+    "reorg": {
+      "phase": "late",
+      "tags": ["process_heavy", "morale_low"],
+      "title": "Reorg Proposal",
+      "text": "Leadership suggests splitting platform and product squads. Align or push back?",
+      "options": {
+        "align": {
+          "hint": "Align and support",
+          "description": "Lean in and shape the org design.",
+          "immediate": { "company.stakeholder": 3, "company.morale": -2 }
+        },
+        "modify": {
+          "hint": "Propose alternative",
+          "description": "Keep teams stable; add virtual guilds.",
+          "immediate": { "leader.trust": 2, "company.velocity": 1 }
+        },
+        "push_back": {
+          "hint": "Push back",
+          "description": "Delay reorg to avoid disruption.",
+          "immediate": { "company.morale": 2, "company.stakeholder": -2 }
+        }
+      }
+    },
+    "compliance_deadline": {
+      "phase": "late",
+      "tags": ["process_heavy", "stakeholder_pressure"],
+      "title": "Compliance Deadline",
+      "text": "SOX/GDPR controls must be in place this quarter. Prioritize audit work or risk findings?",
+      "options": {
+        "prioritize": {
+          "hint": "Prioritize controls",
+          "description": "Staff audit work now.",
+          "immediate": { "company.stakeholder": 3, "company.velocity": -2 }
+        },
+        "parallel": {
+          "hint": "Do in parallel",
+          "description": "Split a tiger team; keep roadmap moving.",
+          "immediate": { "company.velocity": -1, "leader.trust": 1 }
+        },
+        "risk": {
+          "hint": "Accept risk",
+          "description": "Document gaps and continue executing.",
+          "immediate": { "company.stakeholder": -3, "company.velocity": 2 }
+        }
+      }
+    },
+    "datacenter_migration": {
+      "phase": "late",
+      "tags": ["tech_debt_high", "velocity_low"],
+      "title": "Datacenter Migration",
+      "text": "Legacy services must move regions. Big lift. Parallelize, phased, or lift‑and‑shift?",
+      "options": {
+        "parallelize": {
+          "hint": "Parallelize teams",
+          "description": "Multiple streams with strong PMO.",
+          "immediate": { "company.velocity": 2, "hidden.burnout": 2, "company.morale": -2 }
+        },
+        "phased": {
+          "hint": "Phased rollout",
+          "description": "Migrate the most brittle systems first.",
+          "immediate": { "company.tech_debt": -3, "company.velocity": -1 }
+        },
+        "lift_shift": {
+          "hint": "Lift & shift",
+          "description": "Minimal changes to hit deadline.",
+          "immediate": { "company.velocity": 1, "company.tech_debt": 2 }
+        }
+      }
+    },
+    "board_pressure": {
+      "phase": "late",
+      "tags": ["stakeholder_pressure", "financials_low"],
+      "title": "Board Pressure",
+      "text": "The board demands a path to profitability. Cut burn, grow revenue, or pitch a financing plan?",
+      "options": {
+        "cut_burn": {
+          "hint": "Cut burn",
+          "description": "Reduce vendor spend and freeze non‑critical work.",
+          "immediate": { "economy.burnRate": -0.3, "company.velocity": -1, "company.financials": 3 }
+        },
+        "grow_rev": {
+          "hint": "Grow revenue",
+          "description": "Prioritize monetization features.",
+          "immediate": { "economy.revenueIndex": 0.5, "company.stakeholder": 2, "company.tech_debt": 1 }
+        },
+        "finance": {
+          "hint": "Finance plan",
+          "description": "Pitch bridge financing to extend runway.",
+          "immediate": { "company.stakeholder": 2, "company.financials": 2 }
         }
       }
     }
