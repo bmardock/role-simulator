@@ -1,138 +1,25 @@
 // Mock API for GitHub Pages deployment
-// This replaces the need for a backend server
+// This replaces the need for a backend server by using static deck.json data
 
 (function() {
-  // Mock scenario data
-  const mockScenarios = [
-    {
-      id: "startup-1",
-      scenario: {
-        phase: "early",
-        tags: ["onboarding", "team_building"],
-        title: "First Team Meeting",
-        text: "It's your first week as the new engineering manager. The team seems skeptical of yet another leadership change. How do you establish credibility?",
-        options: {
-          option1: {
-            hint: "Listen first",
-            description: "Spend time understanding the team's challenges before making changes.",
-            immediate: { "leader.trust": 2, "company.morale": 1, "company.velocity": -1 },
-            tags: ["people_focused", "collaborative"],
-            summary: "You chose to listen and understand before acting, building trust but slowing initial progress."
-          },
-          option2: {
-            hint: "Quick wins",
-            description: "Identify and fix immediate pain points to show impact.",
-            immediate: { "company.velocity": 2, "leader.execution": 1, "leader.trust": -1 },
-            tags: ["execution_focused", "quick_decision"],
-            summary: "You focused on delivering quick wins to demonstrate competence, but may have rushed the relationship building."
-          },
-          option3: {
-            hint: "Set vision",
-            description: "Present your strategic vision for the team's future.",
-            immediate: { "leader.vision": 2, "company.stakeholder": 1, "company.morale": -1 },
-            tags: ["strategic", "vision_driven"],
-            summary: "You shared your vision for the team's future, inspiring some but potentially overwhelming others."
-          }
-        }
+  // Load static scenario data from deck.json
+  let deckData = null;
+  
+  // Try to load deck.json data
+  async function loadDeckData() {
+    try {
+      const response = await fetch('./deck.json');
+      if (response.ok) {
+        deckData = await response.json();
+        console.log('Loaded deck.json with', Object.keys(deckData.scenarios || {}).length, 'scenarios');
       }
-    },
-    {
-      id: "startup-2", 
-      scenario: {
-        phase: "early",
-        tags: ["resource_constraint", "prioritization"],
-        title: "Feature vs. Bug Fix",
-        text: "A critical bug is blocking production, but the CEO wants the new feature shipped by Friday. The team is split on what to prioritize.",
-        options: {
-          option1: {
-            hint: "Fix bug first",
-            description: "Address the production issue before moving to new features.",
-            immediate: { "company.velocity": 1, "company.stakeholder": -2, "leader.trust": 1 },
-            tags: ["technical", "quality_focused"],
-            summary: "You prioritized system stability over feature delivery, maintaining quality but disappointing stakeholders."
-          },
-          option2: {
-            hint: "Parallel work",
-            description: "Split the team to handle both simultaneously.",
-            immediate: { "company.velocity": -1, "company.morale": -2, "leader.execution": 1 },
-            tags: ["execution_focused", "ambitious"],
-            summary: "You attempted to handle both priorities simultaneously, showing execution skills but risking team burnout."
-          },
-          option3: {
-            hint: "Negotiate timeline",
-            description: "Work with the CEO to adjust expectations and create a realistic plan.",
-            immediate: { "leader.trust": 1, "company.stakeholder": 1, "company.velocity": -1 },
-            tags: ["collaborative", "strategic"],
-            summary: "You negotiated a more realistic timeline, building trust with stakeholders while managing team capacity."
-          }
-        }
-      }
-    },
-    {
-      id: "scaleup-1",
-      scenario: {
-        phase: "mid", 
-        tags: ["tech_debt_high", "scaling_issues"],
-        title: "Architecture Decision",
-        text: "Your system is struggling under increased load. The team wants to rewrite the core service, but stakeholders need features delivered. What's your approach?",
-        options: {
-          option1: {
-            hint: "Rewrite now",
-            description: "Invest in a complete rewrite to solve the scaling issues.",
-            immediate: { "company.tech_debt": -3, "company.velocity": -2, "company.stakeholder": -1 },
-            tags: ["technical", "long_term"],
-            summary: "You committed to a full rewrite, reducing technical debt but significantly slowing feature delivery."
-          },
-          option2: {
-            hint: "Incremental fixes",
-            description: "Make targeted improvements while continuing feature development.",
-            immediate: { "company.tech_debt": -1, "company.velocity": 1, "company.morale": 1 },
-            tags: ["balanced", "pragmatic"],
-            summary: "You chose incremental improvements, making steady progress on both technical debt and features."
-          },
-          option3: {
-            hint: "Hire expertise",
-            description: "Bring in senior engineers to accelerate the rewrite while maintaining feature velocity.",
-            immediate: { "company.financials": -2, "company.velocity": 1, "company.tech_debt": -2 },
-            tags: ["strategic", "investment"],
-            summary: "You invested in additional expertise, accelerating technical improvements at a financial cost."
-          }
-        }
-      }
-    },
-    {
-      id: "bigco-1",
-      scenario: {
-        phase: "late",
-        tags: ["process_heavy", "stakeholder_pressure"],
-        title: "Compliance Audit",
-        text: "A compliance audit has revealed several security vulnerabilities. The audit team wants immediate fixes, but your roadmap is already packed with stakeholder requests.",
-        options: {
-          option1: {
-            hint: "Stop everything",
-            description: "Pause all feature work to address security issues immediately.",
-            immediate: { "company.stakeholder": -2, "company.velocity": -2, "leader.trust": 2 },
-            tags: ["crisis_response", "quality_focused"],
-            summary: "You prioritized security over all else, demonstrating strong risk management but disappointing stakeholders."
-          },
-          option2: {
-            hint: "Parallel tracks",
-            description: "Create separate teams for security fixes and feature development.",
-            immediate: { "company.financials": -1, "company.morale": -1, "company.velocity": 1 },
-            tags: ["execution_focused", "resource_heavy"],
-            summary: "You allocated resources to handle both priorities, maintaining progress while addressing security concerns."
-          },
-          option3: {
-            hint: "Negotiate timeline",
-            description: "Work with audit team to create a phased approach to security fixes.",
-            immediate: { "leader.trust": 1, "company.stakeholder": 1, "company.tech_debt": 1 },
-            tags: ["collaborative", "strategic"],
-            summary: "You negotiated a phased approach, balancing security needs with business requirements."
-          }
-        }
-      }
+    } catch (error) {
+      console.warn('Could not load deck.json:', error.message);
     }
-  ];
+  }
+  
+  // Initialize deck data
+  loadDeckData();
 
   // Enhanced mock service that provides more realistic scenarios
   function buildContextFromState(state) {
@@ -273,21 +160,78 @@
     };
   }
 
+  function selectScenarioFromDeck(context) {
+    if (!deckData || !deckData.scenarios) {
+      console.warn('No deck data available, using fallback');
+      return generateDynamicScenario(context);
+    }
+    
+    const phase = context.turn <= 3 ? "early" : context.turn <= 6 ? "mid" : "late";
+    const scenarios = Object.entries(deckData.scenarios);
+    
+    // Filter by phase
+    let candidates = scenarios.filter(([id, scenario]) => scenario.phase === phase);
+    
+    // If no phase matches, get any scenario
+    if (candidates.length === 0) {
+      candidates = scenarios;
+    }
+    
+    // Filter by tags that match current context
+    const template = context.template;
+    const archetype = context.archetype;
+    
+    // Weight scenarios based on context
+    const weightedCandidates = candidates.map(([id, scenario]) => {
+      let weight = 1;
+      const tags = scenario.tags || [];
+      
+      // Weight by template-specific tags
+      if (template === 'startup' && tags.includes('velocity_low')) weight += 2;
+      if (template === 'startup' && tags.includes('financials_low')) weight += 2;
+      if (template === 'scaleup' && tags.includes('tech_debt_high')) weight += 2;
+      if (template === 'bigco' && tags.includes('process_heavy')) weight += 2;
+      
+      // Weight by archetype preferences
+      if (archetype === 'operator' && tags.includes('execution_focused')) weight += 1.5;
+      if (archetype === 'servant_leader' && tags.includes('people_focused')) weight += 1.5;
+      if (archetype === 'visionary' && tags.includes('strategic')) weight += 1.5;
+      if (archetype === 'firefighter' && tags.includes('crisis_response')) weight += 1.5;
+      
+      return [id, scenario, weight];
+    });
+    
+    // Select weighted random scenario
+    const totalWeight = weightedCandidates.reduce((sum, [, , weight]) => sum + weight, 0);
+    let random = Math.random() * totalWeight;
+    
+    for (const [id, scenario, weight] of weightedCandidates) {
+      random -= weight;
+      if (random <= 0) {
+        return { id, scenario };
+      }
+    }
+    
+    // Fallback to first scenario
+    const [id, scenario] = candidates[0] || scenarios[0];
+    return { id, scenario };
+  }
+
   async function asyncRequest(context) {
     try {
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 700));
+      await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 300));
       
       if (context.requestType === 'batch') {
         // Return multiple scenarios for batch requests
         const scenarios = [];
         for (let i = 0; i < 3; i++) {
-          scenarios.push(generateDynamicScenario(context));
+          scenarios.push(selectScenarioFromDeck(context));
         }
         return { scenarios: scenarios };
       } else {
         // Return single scenario
-        return generateDynamicScenario(context);
+        return selectScenarioFromDeck(context);
       }
     } catch (error) {
       console.warn('[Mock API] Request failed:', error.message);

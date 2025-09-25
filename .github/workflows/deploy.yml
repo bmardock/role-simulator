@@ -36,84 +36,17 @@ jobs:
           cp index.html dist/
           cp style.css dist/
           cp script.js dist/
-          cp scenarioService.js dist/
+          cp api-mock.js dist/
           cp deck.json dist/ 2>/dev/null || echo "deck.json not found, skipping"
           cp milestones.json dist/ 2>/dev/null || echo "milestones.json not found, skipping"
           
-          # Create a simple API mock for GitHub Pages
-          cat > dist/api-mock.js << 'EOF'
-          // Mock API for GitHub Pages deployment
-          window.ScenarioService = {
-            buildContextFromState: function(state) {
-              return {
-                turn: state.turn,
-                archetype: state.archetype,
-                template: state.template,
-                leader: state.leader,
-                company: state.company,
-                hidden: state.hidden,
-                economy: state.economy,
-                flags: state.flags,
-                recentScenarios: (state.recentScenarios || []).slice(0, 5),
-                recentChoices: (state.recentChoices || []).slice(0, 5),
-                pressure: typeof computePressure === "function" ? computePressure() : undefined,
-                dice: state.currentDice,
-                diceInfluence: null,
-                archetypePreferences: null,
-                companyContext: null
-              };
-            },
-            asyncRequest: async function(context) {
-              // Return mock scenario data
-              const mockScenarios = [
-                {
-                  id: "mock-1",
-                  scenario: {
-                    phase: context.turn <= 3 ? "early" : context.turn <= 6 ? "mid" : "late",
-                    tags: ["leadership", "decision"],
-                    title: "Team Meeting Conflict",
-                    text: "Your team is divided on a critical technical decision. The senior engineer wants to refactor the legacy system, while the product manager insists on shipping new features first.",
-                    options: {
-                      option1: {
-                        hint: "Technical first",
-                        description: "Prioritize the refactoring to improve long-term velocity.",
-                        immediate: { "company.velocity": 2, "company.tech_debt": -3, "company.morale": -1 },
-                        tags: ["technical", "long_term"],
-                        summary: "You chose to invest in technical debt reduction, improving velocity but potentially frustrating the product team."
-                      },
-                      option2: {
-                        hint: "Feature first",
-                        description: "Ship the features to satisfy stakeholders and maintain momentum.",
-                        immediate: { "company.stakeholder": 2, "company.velocity": 1, "company.tech_debt": 2 },
-                        tags: ["stakeholder", "short_term"],
-                        summary: "You prioritized immediate feature delivery, pleasing stakeholders but accumulating technical debt."
-                      },
-                      option3: {
-                        hint: "Compromise",
-                        description: "Find a middle ground that addresses both concerns.",
-                        immediate: { "leader.trust": 1, "company.morale": 1, "company.velocity": -1 },
-                        tags: ["collaborative", "balanced"],
-                        summary: "You worked to find a compromise that balanced technical and business needs."
-                      }
-                    }
-                  }
-                }
-              ];
-              
-              // Simulate API delay
-              await new Promise(resolve => setTimeout(resolve, 500));
-              
-              if (context.requestType === 'batch') {
-                return { scenarios: mockScenarios };
-              } else {
-                return mockScenarios[0];
-              }
-            }
-          };
-          EOF
-          
-          # Update index.html to use the mock API
-          sed -i 's|<script src="scenarioService.js"></script>|<script src="api-mock.js"></script>|g' dist/index.html
+          # Verify deck.json is present
+          if [ -f "dist/deck.json" ]; then
+            echo "✅ deck.json included in deployment"
+            echo "Scenarios available: $(jq '.scenarios | keys | length' dist/deck.json)"
+          else
+            echo "⚠️  deck.json not found - scenarios will use fallback generation"
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
